@@ -5,6 +5,64 @@ http://ling.snu.ac.kr/class/AI_Agent/
 
 ---
 
+## 02 Finite State Automata
+
+### 정의
+
++ 유한한 수의 상태와 transition을 가진 오토마타(기계, 회로, 알고리즘)
+
+### 유한하다는 것
+
++ 정규언어(regular expression)는 반복되는 형태가 있기 때문에 적은(유한한) 개수의 state로도 표현할 수 있다.
+
+### p.27 Formally (slide title)
+
++ language의 structure를 구현하는 flow
++ delta function (가장 중요)
+  + q0에서 b를 input으로 받으면 q1으로 가라
+  + q3에서 a를 보면 반복을 해라
+  + q3에서 !를 보면 q4로 넘어가라
+  + q5가 되면 멈춘다.
++ FSA를 만드는 이유는 이대로 컴퓨터의 회로로 구현할 수 있기 때문이다.
+
+
+### p.29 Recognition
+
++ FSA를 recognize algorithm으로 사용할 수 있다.
+
+### deterministic vs. non-deterministic
+
++ qn에서 특정 input이 들어왔을 때 어느 상태로 가면 되는지 결정되어 있으므로 deterministic하다고 말한다.
++ 그러나 실제 자연어에서는 non-deterministic한 경우가 많다.
+
+### non-deterministic
+
++ 같은 symbol 인풋에 대해서 다른 선택을 할 수도 있다
+
+
+### Problems of non-deterministic
+
++ choice point에서 어떤 결정을 해야 할지 문제가 생긴다.
+  + 선택의 분기점마다 표시를 해두고 특정 길로 갔다가 백업하여 다른 길로 하나 하나씩 다른 path를 모두 찾아간다.
+  + 미리 앞의 state를 살펴보고 결정한다.
+
+### Recognition as search
+
++ recognition 과정은 결국 가능한 combination을 모두 펼쳐 놓고 일일이 체크한다.
++ 이러한 recognition은 인공지능에서 search 문제로 볼 수 있다.
+
+### p.39
+
++ NFA : 입실론 무브먼트 포함하는 오토마타
+
+### Sum
+
++ 지금까지 한 게 formal representation이다.
++ 가장 간단한 방법이 Regular Expression이고 이것을 구현한 것이 FSA이다.
++ FSA는 그대로 컴퓨터 회로에 구현할 수 있다.
+
+---
+
 ## 01 Regular Expression
 
 ### formal representation의 도구
@@ -27,7 +85,7 @@ http://ling.snu.ac.kr/class/AI_Agent/
 | `/[^A-Z]/` | A-Z가 아닌 모든 single character | negation |
 | `/[e][^f]/` | e로 시작하고 뒤에는 f가 아닌 two strings | some included, others excluded |
 
-> **Note**: `/[A-z]/` : A..Z특수문자a..z 매칭한다. 아스키코드를 보면 A-Z와 a-z 사이에 특수문자가 포함되기 때문이다.
+> **Note**: range를 쓸 때는 from A와 to B를 명확히 이해할 필요가 있다. 가령, `/[A-z]/`의 경우 특수문자까지 매칭된다. 아스키코드를 보면 A-Z와 a-z 사이에 특수문자가 포함되기 때문이다.
 
 ### Regular Expression :: Example (2) 반복
 
@@ -35,7 +93,12 @@ http://ling.snu.ac.kr/class/AI_Agent/
 | --- | --- | --- |
 | `/[b]a+!/` | baa! or baaa! baaaa! | repetition |
 
-**1주차 끝.**
+### Regular Expression에서 알아야 할 것들
+
++ Hierarchy 매칭 우선순위가 존재한다
++ 불필요한 내용까지 greedy하게 검색되지 않도록 세밀하게 패턴을 만들어야 한다.
+
+**끝.**
 
 ---
 
