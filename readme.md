@@ -17,9 +17,204 @@ http://ling.snu.ac.kr/class/AI_Agent/
 ---
 ---
 
+## 20171023 3주차 :: 06 Text Classification - Maximum-Entropy
+
+`rec2`
+
+`03-3-Maximum_Entropy_Classifiers_All_new.pdf`
+지금까지는 generative model을 배웠다.
+이제 배울 discriminative model은 성능이 더 좋다.
+
+`p.5`
+Joint(generative) model에서는 $P(c | d)$를 Bayes Rule로 구했었다.
+class에서 feature가 나타날 확률을 연산.
+discriminative model에서는 feature를 바탕으로 어떤 class에 속하는지 연산.
+
+| | ge | dis |
+|---|---|---|
+| . | .  | .  |
+
+`p.10` discriminative model에서는 언어적인 feature를 더 넣기 쉽다.
+
+`p.11` 나이브 베이즈는 언어적인 feature를 만들 수 없다.
+discriminative model은 언어적인 feature를 임의로 만들 수 있다.
+LOCATION, DRUG, PERSON을 분류하려고 한다.
+
++ $f_1$(feature 1) : ~하면 LOCATION으로 분류한다.
++ $f_2$ : 액센트가 붙은 라틴자가 있으면 LOCATION 분류가 된다.
++ $f_3$ : 어떤 단어가 C로 끝나면 DRUG을 분류될 수 있다.
+
+> **Note**: $\wedge$ = and
+
+나중에는 각각의 feature마다 weight(가중치)를 줄 수 있다.
+이 weight를 학습하는 것이 굉장히 중요한데, weight를 조절하는 방법은 딥러닝에서 backpropagation하듯이 처리한다.
+언어적인 현상을 feature에 넣어서 계산을해서 분류하는 모델이 discriminative model이다.
+feature-based model.
+이를 어떤 식으로 연산할지 Maxent와 logistic에 대한 이론적인 얘기를 해보자.
+
+`p.12`
+empirical = 실제의.
+실제 acutal count와 모델에서의 expectation.
+이 값이 최대로 되는 모델링을 한다.
+
+`p.16`
+**Maxent Classifier**.
+
+`p.18`
+우리가 지금 하는 것은 linear classifier이다.
+딥러닝은 non-linearity를 찾아서 데이터를 잘 분류하는 것이다.
+어떻게 feature를 만들고 classifier에 집어넣을지 알아보자.
+중요한 점은 feature를 만들 뿐 아니라 feature에 대한 weight를 설정하고 weight를 학습하고, classifier의 연산에 넣겠다는 것이다.
+
+`p.21`
+linguistic feature에 따라 weight를 곱했던 score 값을 확률값으로 바꿔보자.
+logistic model.
+
+**끝.**
+
+---
+
+## 20171023 3주차 :: 06 Text Classification - Naive Bayes
+
+**복습.**
+가장 심플한 formal representation으로 regular expression 배웠음
+두 단어 간의 형태의 유사성을 측정하는 edit distance 했음.
+실제로 language modeling하는 n-gram 이야기했음.
+Markov assumption.
+그 다음에 정보이론으로 정보 측정하는 방법 이야기 함.
+크로스 엔트로피.
+
+본격적으로 classify 이론 배운다.
+가장 심플한 naive-bayes부터 maximum-entropy, 그리고 speech에서 사용하는 HMM, 그리고 Tagging을 배우면 언어를 처리하는 기본적인 방법론 배우는 것.
+
+그 다음은 구조.
+구문 분석은 쉽지 않다.
+한국어는 형태소가 복잡하므로 구문 분석 어려움.
+한국어는 어순이 자유롭기 때문에 rule을 기술하는 게 쉽지 않음.
+
+그 다음은 word2vec.
+논문에 나온 것을 실제로 apply하는 것.
+딥러닝 기반의 processing 하는 것을 예를 보고 실습할 것.
+
+**수업**.
+`03-1-naivebayes_short.pdf`
+지난 시간 text classification 이야기 했었다.
+작가 찾기, 글쓴 사람 여성/남성 찾기, 긍정/부정 review 구별하기 등등의 문제가 해당된다.
+
+**Naive Bayes Intuition**.
+확률에 기반한 방법.
+Bayes Rule에 의해서 나이브(심플)하게 클래스하는 방법이다.
+나이브 베이즈의 가장 큰 특징은 Bag of Words이다.
+Bag of words는 특징이 될 만한 단어를 bag에 넣어둔 것이다.
+구조적인 정보나 언어적인 정보는 무시하고 중요한 단어만 넣어두고 중요한 단어가 얼마나 많이 나왔냐를 고려하는 것.
+언어적 정보를 무시하고 다만 이 단어가 얼마나 나타났느냐를 따지는 방법.
+
+대부분의 텍스트에 등장하고 classification 하는 데 도움이 되지 않는 단어를 stopwords라고 한다.
+그러나 텍스트의 성격에 따라 stopwords를 잘 골라서, 실제 classification 때 날려버려야 한다.
+뜻이 있는 단어는 content word라고 한다.
+
+수학적 계산. `p.22`
+
++ Posterior : $P(c | d)$.
+  + document $d$가 왔을 때 class $c$일 확률.
++ Bayes Rule : $P(c | d) = \frac{P(d | c)P(c)}{P(d)}$.
+  + 사전확률 $P(c)$는 쉽게 구할 수 있음.
+  + 중요한 것은 $P(d | c)$를 어떻게 구할까.
+
+
+**$P(d | c)$를 구하는 아이디어**.
+document $d$를 document에 들어 있는 feature ($x_1, x_2, \cdots, x_n$)로 represent한다 (generalize, generative model).
+
+우리의 모델.
+$P(x_1, x_2, \cdots, x_n | c)$.
+각각의 class가 주어졌을 때 어떤 feature가 등장할 확률.
+
+assumption:
+  + Bag of Words : 문장의 위치는 중요하지 않다.
+  + conditional independence : 특정한 글의 특정한 feature는 모두 independent하다. 그래서 시퀀스를 연쇄적으로 곱해나갈 수 있다.
+    + $P(x_1, x_2, \cdots, x_n | c) = P(x_1 | c) \times \cdots \times P(x_n | c)$
+
+실제로 언어 structure가 independent 할까?
+그렇지 않을 수 있다.
+자주 쓰는 단어 조합인 collocation도 그렇고 특정한 품사 뒤에 특정한 품사가 나올 수 없는 rule을 고려해봐도 independent라고 하기 어렵다.
+특정 단어가 나오면 다음 단어가 100% 나올 경우도 independent라고 할 수 없다.
+이런 문제가 나올 수 있다.
+그렇지만 굉장히 심플하고 빠르게 작동하고, 실제 데이터에 가장 큰 확률을 찾으므로 장점이 많다.
+실제 classification work에서는 가장 기준이 되는 성능으로 삼는다.
+
+정리하면, 나이브 베이즈는 베이즈룰을 적용시켜서 classification 한다.
+... 확률을 최대화하는 것을 구한다.
+두 가지 assumption이 있었다.
+
+`p.27`
+나이브 베이즈는 사실 확률을 다 곱하는 것이다.
+가령, 경제 class가 나올 확률에다가 경제 class의 feature를 모두 곱해서 argument를 maximize하는 값을 취한 후, 거기에 해당하는 class가 최종 class가 된다.
+
+
+`p.31`
+실제로 나이브 베이즈의 확률을 어떻게 구하느냐.
+특정 class가 나타날 확률은 전체 document 중에서 해당 class가 나타나는 수로 나눈다.
+정치 class에서 어떤 단어가 나타난 수를 다 counting한 것으로 전체 등장한 단어수로 나눠서 확률을 구한다.
+$w \in V$에서 $V$는 word type을 말한다.
+
+zero-count smoothing.
+N-gram에서 특정한 단어가 topic에 나타나지 않았을 때, 즉 특정 확률이 0이 되면 전체가 0으로 만들기 때문에 문제가 되었다.
+여기서도 마찬가지므로 조절을 해야 한다.
+어떻게 하면 될까?
+여러 가지 방법이 있다.
+라플라스 스무딩인 add-1을 한다.
+
+`p.36`
+unknown word는 어떻게 할까?
+vocabulary에 $w_u$을 추가한다.
+
+`p.39`
+$P(c | d)$가 우리가 하고자 하는 일.
+그런데 나이브 베이즈에서 이게 전환된다.
+$P(d | c) \times P(c)$가 된다.
+feature를 모두 곱한 것이다.
+china라는 class가 있었을 때 shanghai라는 feature가 등장할 확률이란,
+결국 china class에서 shanghai 라는 feature가 어떤 확률로 generate 되는지 연산을 하는 모델이 되는 것이다.
+이는 이후 살펴볼 discriminative 모델인 maximum-entropy와 반대되는 관점이다.
+
+`p.40`
+나이브 베이즈는 어떤 feature라도 쓸 수 있다.
+가령, URL이나 이메일 주소를 feature로 넣고 이 주소가 있느냐 없느냐를 따질 수 있다.
+주로 word feature를 쓴다.
+그래서 나이브 베이즈는 language modeling과 거의 똑같다.
+language modeling에서 특정 sentence의 확률을 구하기 위해 markov assumption을 썼다.
+앞에 단어가 나올 확률과 다음 단어가 나올 확률을 곱하는 그런 방식이었다.
+이러한 점이 나이브 베이즈와 굉장히 유사하다.
+
+`p.41~42`
+unigram으로 language modeling.
+positive class에 있을 때 'I'가 등장할 확률은 0.1.
+P(d | c) * P(c)여야 한다.
+P(s|pos)와 P(s|neg) 계산할 때, P(positive)=P(negative)=1/2이므로 생략되었다.
+
+`p.45`
+실제로 계산해보기.
+
+`p.46`
+**Double Counting**.
+independence Assumption이 실제 언어 처리에서 나타는 문제.
+perfect하게 dependent한 경우를 떠올리면 된다.
+'San Francisco', 'Hong Kong' 같은 경우 형태로는 떨어져 있지만 의미적으로는 완전히 하나의 단어이다.
+나이브 베이즈로 Hong Kong을 counting 하면 Hong 한 번 카운팅하고, 따로 Kong을 한 번 카운팅한다.
+즉, 하나의 단어에 대한 double counting의 문제가 발생한다.
+확률값에 영향을 미치므로 Classification에 문제가 생길 수 있다.
+
+나이브베이즈.
+그래도 많이 쓴다.
+꽤 잘 work 한다.
+
+
+
+
+
+---
+
 ## 2주차 :: 05 Text Classification
-
-
 
 
 
