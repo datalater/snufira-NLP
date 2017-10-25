@@ -17,7 +17,185 @@ http://ling.snu.ac.kr/class/AI_Agent/
 ---
 ---
 
-## 20171023 3주차 :: 06 Text Classification - Maximum-Entropy
+
+## 20171025 3주차 :: 09 HMM
+
+Finite State Automata 구분:
++ Moore Machine
++ Mealy Machine
+
+우리가 알고 있던 FSA 는 Mealy Machine이다.
+어떤 state를 보고 다음 state로 가는 것이 Mealy Machine.
+input이 b이면 state q1에서 state q2로 옮겨간다.
+그러면 output이 a가 된다.
+
+한 상태에서 다음 상태로 나올 때 output이다.
+output은 현재 input과 현재 state에 의존한다.
+A Mealy Machine is an FSM whose output depends on the present state as well as the present input.
+
+Moore Machine이 HMM의 근간이 되는 Machine이다.
+output은 현재 state에만 의존한다.
+Moore machine is an FSM whose outputs depend on only the present state.
+
+??? 위 내용 재정리해야함
+
+확률이 주어진, weight가 주어진 automata가 Markov Model이다.
+
+내가 관심 있는 것은 'I hate this class'인데,
+
+아이스크림 예제에서는 날씨라는 state가 hidden 되어 있었다.
+그래서 Hidden Markov Model을 사용했다.
+아이스크림 개수가 output이다.
+아이스크림의 개수라는 output은 현재 상태에만 의존한다(output independence assumption).
+각 state는 아이스크림의 개수를 방출할 확률인 emision probability가 정해져 있다.
+하나의 state에서 emission probability의 합은 항상 1이다.
+
+dynamic programming. minimum edit distance 구할 때 했다. dynamic programming이란 big problem을 sub-problem으로 쪼개서 반복 계산을 피하는 것이다.
+
+`https://web.stanford.edu/~jurafsky/slp3/9.pdf`
+
+**Viterbi**. 실제로 가능한 combination 중에서 가장 확률값이 높은 path를 어떻게 찾을 수 있을까?
+observed data에 대한 path를 찾는 효율적인 방법 = Viterbi.
+
+각 노드에 들어오는 값 중에서 더 큰 값만 max를 취한다.
+max path만 찾으면 최종적으로 확률적으로 가장 큰 path를 찾을 수 있다.
+
+
+
+---
+
+## 20171025 3주차 :: 08 Maxent (2)
+
+**복습**.
+document의 class를 구분하는 문제.
+generative model인 나이브 베이즈는 심플하고 independence assumption이 유지되는 상황에서 성능도 좋고, 여러 모델을 비교하기 위한 baseline(기준)으로 쓰이기도 한다.
+그러나 double counting 문제가 발생한다.
+
+discriminative model은 generative model보다 유리하다.
+언어적인 feature를 넣을 수 있기 때문이다.
+각각의 feature는 weight를 가진다.
+feature는 actual counting도 있고 평균적인 기댓값(expectation) 두 가지가 있다.
+이 두 가지 feature가 모델을 최적화하는데 사용된다.
+feature가 적용되는지 안 되는지 binary problem으로 계산한다.
+
+feature를 연산하는 방법.
+feature를 classifier에 넣는 방법은 데이터에 feature가 존재하면 1, 없으면 0으로 binary 계산을 한다.
+classifier에는 feature와 weight의 곱셈으로 계산한다.
+feature를 계산할 때는 binary이므로 (0, 1)로 구분하기 위해서 log를 취한 logit function으로 바꾼다.
+이를 확률 모델로 바꾸기 위해 exponentiate해서 normalize한다.
+이때 normalize 방법을 softmax function이라 한다.
+
+**수업**.
+분류 작업을 처음 시작할 때는 소수의 feature를 발견한다.
+그 후 새로운 feature를 발견할 때마다 feature를 add 한다.
+feature를 add 한다는 것은 데이털르 설명하는 현상을 찾았다는 뜻이다.
+처음에는 뭉뚝한 feature로 시작하다가 나중에는 데이터를 잘 설명하는 날카로운 feature를 찾아가는 방식을 maxent라고 한다.
+
+tokenize할 때 나이브 베이즈는  'Hong Kong'처럼 항상 떨어져 있지만 실제로는 한 단어를 두 번 세는 double counting 문제가 있었다.
+Maxent는 이런 double counting을 회피할 수 있다.
+
+`03-3-Maximum_Entropy_Classifiers_All_new.pdf`
+
+`p.31`
+Monaco라는 단어가 나온 document를 Europ으로 분류할지 Asia로 분류할지 살펴보자.
+
+prior:
++ $P(A)=P(E)= \frac{1}{2}$
+
+likelihood:
++ $P(M|A) = \frac{2}{8} = \frac{1}{4}$
++ $P(M|E) = \frac{6}{8} = \frac{3}{4}$
+
+posterior:
++ $P(M | A) \times P(A) = \frac{1}{2} \times \frac{1}{4} = \frac{1}{8}$
++ $P(M | E) \times P(E) = \frac{1}{2} \times \frac{3}{4} = \frac{3}{8}$
+
+$\therefore$ Europe으로 분류
+
+> **Note**: posterior : $P(d | c) \times P(c)$
+
+`p.33`
+나이브베이즈의 Hong Kong 분류
+
+prior:
+
+likelihood:
+
+posterior:
+
+`p.42`
+maxent로 하면 actual count와 predict count가 최소화되는 feature를 찾을 수 있다.
+좋은 feature를 add할 때마다 entropy가 줄어들고 actual data의 likelihood는 높아진다.
+
+데이터의 형태를 모를 때는 uniform으로 가정하는 것이 가장 합리적이다.
+feature를 add 하면서 점점 불확실성을 줄어들게 만들어라.
+그러면 모델의 likelihood도 높아진다.
+
+log likelihood로 생각하면 likelihood가 convex 형태가 되고, 데이터를 잘 반영하는 feature를 넣어가면서 entropy가 최소화되는 parameter를 찾는다.
+
+`----------휴식----------`
+
+`p.5` 반복.
+나이브베이즈는 generative model이다.
+주어진 document(데이터)의 class를 분류할 때, 나이브 베이즈는 ~한다.
+discriminative는 여러 document가 있을 때 condition을 고려해서 class를 분류한다.
+이때 document의 특징이 되는 feature를 설계해야 한다.
+
+`p.49`
+엔트로피는 분포의 불확실성을 측정하는 개념이다.
+"surprise"는 확률이 높을수록 중요성이 떨어지므로 Px를 역수 1/Px로 취하고, 가법성의 법칙을 만족시키기 위해 log를 취한 것이다.
+엔트로피는 "surprise"를 평균낸 것이다.
+
+맨 처음에는 잘 모르니 uniform distribution으로 가정한다.
+uniform한 상태에서는 maximum entropy가 된다.
+데이터를 반영하는 constraint를 넣는다.
+constraint = feature.
+contstraint를 넣는다는 것은 maximum entropy를 낮춘다는 것이다.
+
+단계:
+1. entropy가 최대화되는 uniform distribution을 가정한다.
+2. 그래야 maximum entropy가 된다.
+3. 데이터를 반영하는 constraint, 즉 feature를 넣어서 entropy를 줄어들게 만든다.
+4. 그러면 데이터에 대한 모델의 likelihood가 커진다.
+
+`p.51`
+
++ left : 동전 던지기를 unifrom distribution으로 가정한다.
++ middle : 'head와 tail이 나올 확률의 합이 1이다'라는 constraint를 추가하고, constraint를 직선으로 그린다.
++ right : head가 나올 확률이 0.3 이라는 constraint를 추가한다.
+
+`p.52~53`
+
++ event space : part of speech 6개의 class
++ empricial data : 총 36
++ Maximize H :
++ want probabilities : 맨처음에는 엔트로피가 가장 높은 uniform distribution으로 가정한다.
++ feature 설계 : 실제 데이터에 맞는 constraint를 찾아내서 적용한다. 이때도 uniform하게 가정한다. 자주 나오는 NN, NNS, NNP, NNPS에 32/36을 4개로 나누고, 나머지 값도 2개로 나눈다.
++ actual data를 반영하는 feature 추가 : 자주 나오는 NNP, NNPS를 24/36에서 동등하게(uniformly) 확률값을 분배한다.
+
+`p.54`
+위에서 이야기한 방법이 가능한 이유.
+convexity.
+개별 데이터 포인트에 weight와 feature가 있다.
+슬라이드에 있는 upper bound 식은 convexity를 보장하는 방정식이다.
+
+`p.61`
+
+1. 일단 전체 합이 1이 되도록 uniform하게 분배한다. 그래서 1/4씩 분배한다.
+2. Empirical 데이터를 보니 A가 전체 6개 중에 4번, 즉 4/6 = 2/3가 나오더라. 그러니 A의 값이 2/3가 되도록 A가 차지하는 두 칸에 1/3, 1/3씩 uniform하게 분배한다.
+3. 같은 feature인 A에 대한 feature를 추가해도 A에 해당하는 칸에 다시 uniform 하게 나눠주기 때문에 distribution이 바뀌지 않는다.
+
+나이브베이즈에서는 'Hong', 'Kong'을 한번씩 세므로 double counting이 되어 distribution이 바뀌었지만, Maxent에서는 feature가 overlap 되어도 다시 uniform distribution으로 만들어주기 때문에 distribution이 바뀌지 않는다.
+
+나이브베이즈에서는 'Hong' 뒤에 'Kong'이 오는 것이나 'Kong' 앞에 'Hong'이 오는 것이나 같은 조건인데도 불구하고 개별적으로 counting하게 된다.
+
+`시험 : 다음주 월요일 10/30까지 배운 내용으로 11/1 수요일에 시험 봄`
+
+`----------휴식----------`
+
+---
+
+## 20171023 3주차 :: 07 Maxent (1)
 
 `rec2`
 
@@ -30,9 +208,9 @@ Joint(generative) model에서는 $P(c | d)$를 Bayes Rule로 구했었다.
 class에서 feature가 나타날 확률을 연산.
 discriminative model에서는 feature를 바탕으로 어떤 class에 속하는지 연산.
 
-| | ge | dis |
+| NLP | generative model | discriminative model |
 |---|---|---|
-| . | .  | .  |
+| feature | 언어적인 feature (x)  | 언어적인 feature (o) |
 
 `p.10` discriminative model에서는 언어적인 feature를 더 넣기 쉽다.
 
@@ -74,7 +252,7 @@ logistic model.
 
 ---
 
-## 20171023 3주차 :: 06 Text Classification - Naive Bayes
+## 20171023 3주차 :: 06 Naive Bayes
 
 **복습.**
 가장 심플한 formal representation으로 regular expression 배웠음
