@@ -646,15 +646,42 @@ bi-gram 없으면 uni-gram으로 backoff 해라.
 
 ## 1주차 :: 02 Finite State Automata
 
-### 정의
+FSA는 regular expression을 실행시킬 도구이다.
 
-+ 유한한 수의 상태와 transition을 가진 오토마타(기계, 회로, 알고리즘)
+**FSA**: 유한(finite) 개의 state와 transition을 가진 automata(기계, 회로, 알고리즘)
 
-### 유한하다는 것
+**RE to FSA with sheeptalk**: regular expression은 FSA로 mapping 된다.
 
-+ 정규언어(regular expression)는 반복되는 형태가 있기 때문에 적은(유한한) 개수의 state로도 표현할 수 있다.
++ sheeptalk : baa! baaa! baaa! ... baaaaaa!
++ regular expression : `/baa+!/`
++ fsa : ![fsa.png](images/fsa.png)
 
-### p.27 Formally (slide title)
+sheeptalk에 대한 fsa가 완성되었다.
+위 fsa는 어떤 intput이 오느냐에 따라 어느 state로 이동해야 할지 이미 결정되어 있다.
+가령, $q_1$은 $a$라는 input이 오면 $q_2$로 넘어가고 다른 input이 들어오면 아무런 동작도 하지 않는다.
+이렇게 input에 따라 action이 정해진 fsa를 deterministic 알고리즘이라고 한다.
+추후 배울 non-deterministic automata는 어떤 state로 이동해야 할지 정해져 있지 않으므로 반드시 결정이 뒤따른다.
+
+
+**FSA as a model**:
+FSA도 일종의 모델이다.
+이러한 언어 모델은 string을 생성도 하고 인식도 할 수 있다.
+언어 모델을 $m$이라고 하면 $m$에 의해 characterize 되는 formal language를 $L(m)$이라고 한다.
+formal language는 유한 개의 문자로 구성되는 string set을 뜻한다.
+가령, sheeptalk에 대한 formal language는 다음과 같이 정의된다.
+
+$L(m) = \{baa!, baaa!, baaaa!, \cdots \}$
+
+**Formal Language vs. Natural Language**:
+사람이 실제로 말하는 언어를 natural language라고 한다.
+formal language는 natural language와 전혀 다를 수 있다.
+중요한 점은 formal language는 natural language를 모델링하는데 사용된다는 점이다.
+phonology, morphology, 또는 syntax와 같은 natural language의 특징을 모델링할 수 있다.
+
+`p.46 Summary부터 할 차례`
+
+
+**FSA(old)**
 
 + language의 structure를 구현하는 flow
 + delta function (가장 중요)
@@ -702,37 +729,88 @@ bi-gram 없으면 uni-gram으로 backoff 해라.
 
 ---
 
+## Stanford NLP :: 2-4 Word Normalization and Stemming
+
+tokenization 이후에 normalization을 해야 한다.
+
+**Need to "normalize" terms**: Information Retrieval : indexed text & query terms must have same form. e.g. we want to match U.S.A. and USA
+
+---
+
+## Stanford NLP :: 2-3 Word Tokenization
+
++ Lemma : same stem, part of speech, rough word sense
+  + cat and cats = same lemma
++ Wordform : the full inflected surface formal
+  + cat and cats = different wordforms
+
+**How many words?**:
+
+"they lay back on the San Francisco grass and looked at the stars and their"
+
++ **Type** : a unique element of vocabulary
++ **Token** : an instance of that type in running text
+
+San Francisco를 하나로 세면 14 tokens, 두 개로 세면 15 tokens.
+13 types (or 12)(or 11)s.
+
+**notation**:
+
++ $N$ : number of tokens
++ $V$ : set of types = vocabulary
+
+**Issues in Tokenization**:
+
+Before  | After (matter of choice)
+--|--
+Finland's captial  |  Finland Finlands Finland's
+what're, I'm, isn't  | What are, I am, is not
+Hewelett-Packard  |  Hewlett Packard
+San Francisco  |  one token or two
+
+
+---
+
 ## 1주차 :: 01 Regular Expression
 
-### formal representation의 도구
-
-+ 인간의 언어를 컴퓨터에게 이해시키는 formal representation의 한 가지 방법으로 Regular Expression을 사용할 수 있다.
+인간의 언어를 컴퓨터에게 이해시키는 formal representation의 한 가지 방법으로 Regular Expression을 사용할 수 있다.
 
 > **Note**: 촘스키의 언어 표현 단위에 따르면 가장 작은 단위인 regular expression을 포함한 4가지가 있다.
 
-### Regular Expression
+어떤 기호를 가지고 패턴을 만들면 원하는 search string을 찾을 수 있다.
+이러한 패턴을 regular expression이라 한다.
 
-+ 어떤 기호를 가지고 패턴을 만들면 원하는 search string을 찾을 수 있다.
-+ 이러한 패턴을 regular expression이라 한다.
-
-### Regular Expression :: Example (1) 한 글자
-
-| RE | 매칭 예시 | 기능 |
+| Pattern | Matches | 기능 |
 | --- | --- | --- |
-| `/[aA]/` | a 또는 A | chracter disjunction  |
+| `/[aA]/` | a 또는 A | disjunction  |
 | `/[A-Za-z]/` | ABCDEFG...Zabcdefg...z에 해당하는 모든 single character | range |
 | `/[^A-Z]/` | A-Z가 아닌 모든 single character | negation |
 | `/[e][^f]/` | e로 시작하고 뒤에는 f가 아닌 two strings | some included, others excluded |
+| `/[b]a+!/` | baa! or baaa! baaaa! | repetition |
+| colou?r | color colour  | optional previous char  |
+| oo*h!   | oh! ooh! oooh! ooooh!   | 0 or more of previous char  |
+| oo+h!   |  same as the above  | 1 or more of previous char  |
+| o{3,4}h! | oooh! ooooh!  | from 3 to 4 occurence of previous char |
+| o{3,}h! | oooh! ooooh! ooooooooh!  | at least 3 occurence of previous char |
+| beg.n   | begin begun began beg3n  | dot means any character  |
+| cat\|dog  | cat and dog  | disjunction  |
+| ^my   | starting any strings with 'my'  | anchor  |
+| did.$   | ending any strings with 'did'  | anchor  |
 
 > **Note**: range를 쓸 때는 from A와 to B를 명확히 이해할 필요가 있다. 가령, `/[A-z]/`의 경우 특수문자까지 매칭된다. 아스키코드를 보면 A-Z와 a-z 사이에 특수문자가 포함되기 때문이다.
 
-### Regular Expression :: Example (2) 반복
+**Advanced Operators**:
 
-| RE | 매칭 예시 | 기능 |
+| Pattern | Expansion | Matches |
 | --- | --- | --- |
-| `/[b]a+!/` | baa! or baaa! baaaa! | repetition |
+| \d | [0-9] | any digit  |
+| \D   | [^0-9]  | any non-digit  |
+| \w   | [a-zA-Z0-9_]  | any alphanumeric or underscore  |
+| \W   | [^\w]  | a non-alphanumeric  |
+| \s   | [blank\r\t\n\f]  | whitespace (space, tab)  |
+| \S   | [^\s]  | Non-whitespace  |
 
-### Regular Expression에서 알아야 할 것들
+Regular Expression에서 알아야 할 것들.
 
 + Hierarchy 매칭 우선순위가 존재한다
 + 불필요한 내용까지 greedy하게 검색되지 않도록 세밀하게 패턴을 만들어야 한다.
@@ -743,19 +821,19 @@ bi-gram 없으면 uni-gram으로 backoff 해라.
 
 ## 00 Introduction (2)
 
-### NLP가 크게 각광을 받게 된 이유
+**NLP가 크게 각광을 받게 된 이유**
 
 + IBM Watson이 인간을 꺾고 Jeopardy 우승
 
-### Sentiment Analysis
+**Sentiment Analysis 감정 분석 / 의견 분석**
 
-감정 분석 / 의견 분석
 - 영화평, 상품평이 negative한지 positive한지 분류
 - 온라인상에 엄청난 리뷰들이 올라오는데 이러한 의견을 자동으로 분석해보자.
 - 기업의 경우 sentiment analysis가 매우 중요하다. 유저들의 반응을 실시간으로 살펴가며 흐름을 아는 게 고객관리 차원에서 매우 중요하기 때문에.
 - 이슈들이 어떻게 변화되어 가는지 sentiment analysis로 알 수 있다.
 
-### QA가 어려운 이유
+**QA가 어려운 이유**
+
 - domain이 제한되어 있지 않으므로 질문을 이해하거나 답변을 찾아야 할 범위가 너무 넓음
 - 질의 자체를 이해하는 게 쉽지 않음
 - 왓슨의 경우 사회자의 말을 듣고 Answering을 한 게 아니라 질문지를 미리 전달 받았음
@@ -764,46 +842,48 @@ bi-gram 없으면 uni-gram으로 backoff 해라.
 
 ## 00 인간 언어의 특징
 
-### Ambiguity
+**Ambiguity**
 
 + 인간 언어에는 우리가 생각하는 것 이상으로 ambiguity 문제가 존재한다.
 + 인간의 언어는 중의적인 의미를 가진다.
 + ambiguity 문제 때문에 semantic processing에서 의미를 어떻게 결정해야 할지 문제가 생긴다.
-+ 이를 '**ambiguity resolution**'이라 한다.
++ 이러한 결정을 '**ambiguity resolution**'이라 한다.
 
-### 한국어와 영어
+**한국어와 영어**
 
 + 한국어는 refraction(굴절)이 굉장히 많다.
 + refraction이 많다는 것은 하나의 단어가 여러 형태를 가진다는 것.
 + language model을 사용할 때 한국어처럼 언어의 꼴이 달라지게 되면 빈도도 떨어지게 되고 모델링이 복잡해진다.
 + 따라서 언어의 특성에 맞게 알고리즘을 개발해야 한다.
 
-### NLP 세 가지 단계
+**NLP 세 가지 단계**
 
-+ human language knowledge
-+ formal representation
-+ efficient algorithm
+1. human language knowledge
+2. formal representation
+3. efficient algorithm
 
 ---
 
 ## 00 Introduction (1)
 
-### What is NLP
+**What is NLP**
 
 + 인간이 이해할 수 있는 언어를 컴퓨터에게 이해시키는 것.
 + 컴퓨터에게 이해시키는 이유? 컴퓨터에게 지시해서 우리가 필요한 것을 얻기 위해.
 + 그래서 인간의 언어가 어떻게 되어있는지 knowledge가 있어야 하고 그 knowledge를 컴퓨터가 이해할 수 있는 형태로 transform 해야 하고, 그러한 과정을 efficent한 algorithm으로 표현할 수 있어야 한다.
 
-### 우리가 배울 것
+**우리가 배울 것**
 
 + 인간의 언어에 대한 knowledge는 있다고 가정하고 (morphology, refraction 등)
 + formal representation과
 + efficient한 algorithm으로 표현하는 방법을 배운다.
 
-### NLP의 역사
+**NLP의 역사**
 
 + Machine Translation, 기계번역의 역사가 곧 NLP의 역사
 + 제2차 세계대전에서 정보를 전달하기 위해 본격적으로 시작됨
+
+**끝.**
 
 ---
 ---
