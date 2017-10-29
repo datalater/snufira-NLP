@@ -644,9 +644,107 @@ bi-gram 없으면 uni-gram으로 backoff 해라.
 
 ---
 
+## stanford NLP :: 3-1 Defining Minimum Edit Distance (to 3-3)
+
+`jurafsky 3.11`
+
+**minimum edit distance**:
+두 문자열이 같아지기 위해서 거쳐야 하는 최소의 편집 개수를 말한다.
+여기서 편집이란 3가지 연산으로 구성되는데 insertion, deletion, substitution을 말한다.
+각 연산은 cost를 발생시키고, 최소 cost가 곧 최소 편집 거리(minimum edit distance)가 된다.
+Levenshtein distance를 사용하면 insertion, deletion은 cost=1, substitution은 cost=2로 계산한다.
+
+> **Note**: insertion: 삽입(add), deletion : 삭제, substitution : 대체
+
+최소 편집 거리는 다이나믹 프로그래밍으로 계산한다.
+다이나믹 프로그래밍은 작은 문제(subproblem)를 푸는 방법을 활용해서 큰 문제(big problem)를 푸는 표 기반(table-driven) 알고리즘을 말한다.
+Viterbi, forward 알고리즘과 같이 음성 인식과 자연어처리에서 흔히 사용하는 방법이다.
+다이나믹 프로그래밍은 표 기반이므로 tabular computation 방식으로 설명할 수 있다.
+
+**Tabular Computation**:
+| N | **9** |   |   |   |   |   |   |   |   |   |
+|:---:|---|---|---|---|---|---|---|---|---|---|
+| O | **8** |   |   |   |   |   |   |   |   |   |
+| I | **7** |   |   |   |   |   |   |   |   |   |
+| T | **6** |   |   |   |   |   |   |   |   |   |
+| N | **5** |   |   |   |   |   |   |   |   |   |
+| E | **4** |   |   |   |   |   |   |   |   |   |
+| T | **3** | 4 (INT → E) | 5 (INT → EX) | Question |   |   |   |   |   |   |
+| N | **2** | 3 (IN → E) | 4 (IN → EX) | 5 (IN → EXE) |   |   |   |   |   |   |
+| I | **1** | 2 (I → E) | 3 (I → EX) | 4 (I → EXE) |   |   |   |   |   |   |
+| # | **0** | **1** | **2** | **3** | **4** | **5** | **6** | **7** | **8** | **9** |
+|   | # | E | X | E | C | U | T | I | O | N |
+
+0. 기준점
+    + D(1,1) = D(I→E) = substitution = 2
+1. 위로 이동
+    + D(2,1) = D(IN → E) = D(I → E) + delete-source(N) = D(1,1) + 1 = 3
+    + D(3,1) = D(INT → E) = D(IN → E) + delete-source(T) = D(2,1) + 1 = D(1,1) + 1 + 1 = 4
+
+2. 오른쪽 이동
+    + D(1,2) = D(I → EX) = D(I → E) + insert-target(E) = D(1,1) + 1 = 3
+    + D(1,3) = D(I → EXE) = D(I → EX) + insert-target(E) = D(1,2) + 1 = D(1,1) + 1 + 1 = 4
+
+3. 대각선 우상단 이동
+    + D(2,2) = D(IN → EX) = D(I → E) + substitute-both(N/X) = D(1,1) + 2
+
+
+Question:
+
++ D(3,3) = D(INT → EXE)
+    1. 위로 이동 = D(IN → EXE) + insert(T) = D(2,3) + 1 = 6
+    2. 오른쪽 이동 = D(INT → EX) + insert(E) = D(3,2) + 1 = 6
+    3. 대각선 우상단 이동 = D(IN → EX) + substitution(T != E) = D(2,2) + 2 =  6
+
+Answer:
+
++ D(3,3) = min(1, 2, 3) = 6
+
+**Code**:
+
++ 초기화
+    + $D(i,0)$ = $i$ (source-deletion을 $i$번 하므로 cost=$1 \times i$)
+    + $D(0,j)$ = $j$ (target-insertion을 $j$번 하므로 cost=$1 \times j$)
+
+```python
+# python은 0-indexed이지만, 여기서는 NLP 책 예제와 같게 하기 위해 (1-indexed)로 설정
+
+# initialize
+D(i, 0) = i
+D(0, j) = j
+
+# edit operation = D(?,?) + cost
+delete-source = D(i-1, j) + 1    # if done, it becomes D(i,j)
+insert-target = D(i, j-1) + 1    # becomes D(i,j)
+substitution = D(i-1, j-1) + 2 if X(i) != Y(j) else D(i-1, j-1) + 0    # becomes D(i,j)
+
+for i in range(len(X)):
+    for j in range(len(Y)):
+        D(i,j) = min(delete-source, insert-target, substitution)
+```
+
+**Full Answer**:
+
+![fully_computed_minimum-edit-distance](images/med_01.png)
+
+
+**Backtrace for Computing Alignments**:
+하지만 지금과 같이 최소 편집 거리(= MinEdit)를 계산하는 것이 매우 비효율적이다.
+그래서 backtrace를 사용한다.
+backtrace를 사용하면 두 문자열 간에 배열이 동일한 문자는 무엇이고, insertion 또는 deletion 또는 substitution이 필요한 문자쌍이 무엇인지 한 눈에 알 수 있다.
+
+![backtrace](images/med_02.png)
+
+`[3-3 Backtrace] #inProgress`
+https://www.youtube.com/watch?v=iQVp4Mq6s6k&list=PL6397E4B26D00A269&t=353
+
+---
+
 ## 1주차 :: 02 Finite State Automata
 
-FSA는 regular expression을 실행시킬 도구이다.
+FSA는 regular expression을 실행시키는 도구이자, 언어 처리에서 중요한 기본 개념이다.
+FSA는 language의 structure를 구현하는 flow이다.
+FSA가 언어 처리에서 중요한 이유는 FSA가 컴퓨터의 회로로 구현할 수 있는 일종의 설계도이기 때문이다.
 
 **FSA**: 유한(finite) 개의 state와 transition을 가진 automata(기계, 회로, 알고리즘)
 
@@ -665,12 +763,12 @@ sheeptalk에 대한 fsa가 완성되었다.
 
 **FSA as a model**:
 FSA도 일종의 모델이다.
-이러한 언어 모델은 string을 생성도 하고 인식도 할 수 있다.
-언어 모델을 $m$이라고 하면 $m$에 의해 characterize 되는 formal language를 $L(m)$이라고 한다.
-formal language는 유한 개의 문자로 구성되는 string set을 뜻한다.
+이러한 언어 모델은 string을 생성하는 알고리즘으로 사용할 수도 있고, 인식하는 알고리즘으로 사용할 수도 있다.
+언어 모델을 $m$이라고 하면 $m$에 의해 characterize 되는 symbol의 조합을 formal language라고 하며, $L(m)$으로 나타낸다.
+formal language는 유한 개의 문자로 구성되는 string set이다.
 가령, sheeptalk에 대한 formal language는 다음과 같이 정의된다.
 
-$L(m) = \{baa!, baaa!, baaaa!, \cdots \}$
+$$L(m) = \{baa!, baaa!, baaaa!, \cdots \}$$
 
 **Formal Language vs. Natural Language**:
 사람이 실제로 말하는 언어를 natural language라고 한다.
@@ -678,33 +776,36 @@ formal language는 natural language와 전혀 다를 수 있다.
 중요한 점은 formal language는 natural language를 모델링하는데 사용된다는 점이다.
 phonology, morphology, 또는 syntax와 같은 natural language의 특징을 모델링할 수 있다.
 
-`p.46 Summary부터 할 차례`
+**Deterministic vs. Non-deterministic**:
 
+![nfsa](images/nfsa.png)
 
-**FSA(old)**
+$q_2$에서 input $a$가 왔을 때, $q_2$로 갈지 $q_3$으로 갈지 정해지지 않았다.
+이러한 decision-point가 존재하는 FSA를 NFSA(Non-deterministic FSA)라고 한다.
 
-+ language의 structure를 구현하는 flow
-+ delta function (가장 중요)
-  + q0에서 b를 input으로 받으면 q1으로 가라
-  + q3에서 a를 보면 반복을 해라
-  + q3에서 !를 보면 q4로 넘어가라
-  + q5가 되면 멈춘다.
-+ FSA를 만드는 이유는 이대로 컴퓨터의 회로로 구현할 수 있기 때문이다.
+![nfsa2](images/nfsa2.png)
 
+NFSA의 또 다른 주요 형태는 위와 같다.
+화살표에 symbol이 없고 epsilon이 있는데 이러한 움직임을 $\epsilon$-transition이라 한다.
+해석하자면, $q_3$에 있을 때 어떤 input 없이도 $q_2$로 이동할 수 있다는 뜻이다.
+즉, $q_3$에서는 ! 화살표(arc)로 갈지 $\epsilon$-transition을 할지 정해지지 않았다.
 
-### p.29 Recognition
+실제 자연어에서는 non-deterministic한 경우가 많다.
 
-+ FSA를 recognize algorithm으로 사용할 수 있다.
+**Summary**:
+이번 장에서는 언어 처리에서 가장 중요한 기본 개념인 finite state automta와 automaton을 기반으로 하는 실용적인 도구인 regular expression을 배웠다.
 
-### deterministic vs. non-deterministic
++ regular expression은 강력한 패턴 매칭 도구이다.
++ regular expression은 finite state automata로 구현할 수 있다.
++ automaton은 automaton이 받아들일 수 있는 string의 조합으로 formal language를 정의한다.
++ deterministic FSA는 현재 state에서 어떤 input을 받든지 어떻게 처리해야 할지 이미 정해져 있다.
++ non-deterministic FSA는 현재 state에서 어떤 input을 받았을 때 선택할 수 있는 여러 가지 길 중에서 결정해야 할 때가 있다.
++ NFSA는 DFSA로 바꿀 수 있다.
++ NFSA가 길을 선택하는 방법은 두 가지로 나뉜다.
+    + agenda-to-stack인 경우 LIFO 또는 depth-frist search
+    + agenda-to-queue인 경우 FIFO 또는 breadth-first search라고 한다.
 
-+ qn에서 특정 input이 들어왔을 때 어느 상태로 가면 되는지 결정되어 있으므로 deterministic하다고 말한다.
-+ 그러나 실제 자연어에서는 non-deterministic한 경우가 많다.
-
-### non-deterministic
-
-+ 같은 symbol 인풋에 대해서 다른 선택을 할 수도 있다
-
+---
 
 ### Problems of non-deterministic
 
@@ -726,6 +827,8 @@ phonology, morphology, 또는 syntax와 같은 natural language의 특징을 모
 + 지금까지 한 게 formal representation이다.
 + 가장 간단한 방법이 Regular Expression이고 이것을 구현한 것이 FSA이다.
 + FSA는 그대로 컴퓨터 회로에 구현할 수 있다.
+
+**끝.**
 
 ---
 

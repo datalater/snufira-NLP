@@ -1,0 +1,29 @@
+######*------unigram------*######
+j_uni_train_entropy: 4.2887
+j_uni_test_entropy: 4.2953
+j_uni_hani_entropy: 4.3283
+j_uni_train_cross_entropy: 4.2887
+j_uni_test_cross_entropy: 4.2897
+j_uni_hani_cross_entropy: 4.3083
+
+s_uni_train_entropy: 7.9639
+s_uni_test_entropy: 7.9977
+s_uni_hani_entropy: 7.9487
+s_uni_train_cross_entropy: 7.9639
+s_uni_test_cross_entropy: 8.0098
+s_uni_hani_cross_entropy: 8.2444
+
+######*------bigram------*######
+j_bi_train_entropy: 0.3239
+j_bi_test_entropy: 0.3264
+j_bi_hani_entropy: 0.3432
+j_bi_train_cross_entropy: 0.3239
+j_bi_test_cross_entropy: 0.3226
+j_bi_hani_cross_entropy: 0.3200
+
+s_bi_train_entropy: 0.0027
+s_bi_test_entropy: 0.0030
+s_bi_hani_entropy: 0.0041
+s_bi_train_cross_entropy: 0.0027
+s_bi_test_cross_entropy: 0.0032
+s_bi_hani_cross_entropy: 0.0037
