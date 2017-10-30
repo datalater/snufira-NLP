@@ -17,6 +17,49 @@ http://ling.snu.ac.kr/class/AI_Agent/
 ---
 ---
 
+## 20171030 4주차
+
+**복습**.
+forward 알고리즘은 dynamic programming의 일종이다.
+best path는 viterbi 알고리즘으로 알아낸다.
+
+
+**수업**.
+
+**backward**:
+
+(slept)
+
+`휴식`
+
+우리가 배우고 있는 것은 best path를 찾아서 사용하는 sequence classifier이다.
+
+```
+11/1(수) 시험 관련
+
+- 3시간
+- 배웠던 건 전부 (~04-1-Tagging.pdf p.35)
+- 문제 수 많음
+- 책, 컴퓨터 (o) 인터넷 (x)
+- 공학용 계산기 필요
+```
+
+**POS tagging**:
+이미 있는 전치사로 새로운 전치사를 만들 수 없으니 closed class이다.
+fax 같은 동사는 기술의 발달로 등장한 새로운 동사이므로 open class이다.
+구동사 give up의 up은 particle이다.
+전치사와 구별이 힘들 수 있다.
+
+Choosing a Tagset.
+N, V, Adj, Adv로 Tagset을 너무 적게 한정하면 Noun 중에서 pronoun이라는 정보가 누락될 수 있다.
+너무 많아도 문제이다.
+많이 쓰는 Tagset은 'Penn TreeBank tagset'이다.
+Treebank : 문장 구조 분석.
+NLTK에도 있음.
+
+
+
+---
 
 ## 20171025 3주차 :: 09 HMM
 
