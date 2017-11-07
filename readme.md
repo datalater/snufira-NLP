@@ -9,12 +9,17 @@ http://ling.snu.ac.kr/class/AI_Agent/
 
 + Regular Expression
 + Finite State Automata
-+ Edit Distance : 두 string의 유사성 판단
++ Edit Distance : 두 string의 유사성 판단``
 + Minimum Edit Distance : 두 string의
 
 
 ---
 ---
+---
+
+##
+
+
 ---
 
 ## 20171030 4주차
@@ -29,6 +34,8 @@ best path는 viterbi 알고리즘으로 알아낸다.
 **backward**:
 
 (slept)
+
+abab 시퀀스를 => baba 시퀀스로 한다.
 
 `휴식`
 
@@ -684,6 +691,114 @@ bi-gram 없으면 uni-gram으로 backoff 해라.
 대부분의 과제 작업에서는 add +0.5를 하면 된다.
 
 **수업끝.**
+
+---
+
+## stanford NLP :: 4-3 Evaluation and Perplexity
+
+**Evaluation : How good is our model?**:
+
++ Does our language model prefer good stances to bad ones?
+
+**Extrinsic Evaluation of N-gram models**:
+
+모델 A와 모델 B를 비교하기 위해 Language Model을 사용하는 application에 적용해본다.
+
++ put in a task : spelling corrector, speech recognizer, MT system
++ run the task and get an accraucy for each models
+
+`Extrinsic의 의미`
+
+**Difficulty of Extrinsic Evaluation**:
+
++ So, sometimes use intrinsic evaluation: perplexity
++ Bad approximation
+
+**Perplexity**:
+
+
+`@@@resume` https://youtu.be/OHyVNCvnsTo?t=5m13s
+
+
+---
+
+## stanford NLP :: 4-2 Estimating N-gram Probabilities
+
+**MLE**:
+
++ `count and divide`
+
+**Raw bigram probabilities**:
+
+**Bigram estimates of sentence probabilities**:
+
++ P(`<s>` I want english food `</s>`) =
+
+**What kinds of Knowledge in Bigram**:
+
+**Practical issues**:
+
++ underflow
+
+
+
+---
+
+## stanford NLP :: 4-1 Introduction to N-grams
+
+**Language Modeling**:
+
+Language Modeling은 문장이나 단어 시퀀스의 확률을 계산한다.
+문장에 확률을 부여하면 여러 방면에서 써먹을 수 있다.
+
++ 기계 번역
+  + P(high winds tonite) > P(large winds tonite)처럼 문장의 확률을 비교해서 확률적으로 더 많이 등장하는 문장을 good으로 판정한다.
+
++ 철자 교정
+  + P(about fifteen minuets from) > P(about fifteen minuets from)
+
++ 음성 인식
+  + P(I saw a van) >> P(eyes awe of an)
+
++ 요약, QA 등
+
+**Language Model Task**:
+
++ $P(W) = P(w_1, w_2, \cdots, w_{n})$
++ $P(w_n | w_1, w_2, \cdots, w_{n-1})$
+
+**Chain Rule**:
+
++ $P(A|B) = \frac{P(A, B)}{P(B)}$
++ $P(A,B) = P(A|B)P(B)$
++ $P(w_1, w_2, w_3, \cdots, w_n) = P(w_1)P(w_2|w_1)P(w_3|w_1, w_2) \cdots P(w_n | w_1, \cdots w_{n-1})$
+
+**Chain Rule applied to compute**:
+
++ P("its water is so transparent")
+
+**Estimate the probability**:
+
++ No.
++ `이유`
+
+**Markov Assumption**
+
++ `computing instead`
++ `given some prefix of the last few words`
+
+**Simplest case: Unigram model**:
+
+**Bigram model**:
+
++ Condition on the previous word
+
+**N-gram models**:
+
++ long-distance dependencies
+
+
+
 
 ---
 
