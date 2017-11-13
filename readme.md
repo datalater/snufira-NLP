@@ -9,7 +9,7 @@ http://ling.snu.ac.kr/class/AI_Agent/
 
 + Regular Expression
 + Finite State Automata
-+ Edit Distance : 두 string의 유사성 판단``
++ Edit Distance : 두 string의 유사성 판단
 + Minimum Edit Distance : 두 string의
 
 
@@ -17,8 +17,158 @@ http://ling.snu.ac.kr/class/AI_Agent/
 ---
 ---
 
-##
 
+
+## 20171113 6주차
+
+**CFG for Languagme Modeling**.
+CFG를 이용하면 parsing tree를 통해 구조를 고려한 languagme modeling이 가능하다.
+
+---
+
+(intentionally blanked)
+
+---
+
+`07-2-vectorsemantics.pdf`
+
+**Vector Semantics**:
+
+합성성의 원리 : 문장에 쓰인 모든 단어의 의미를 다 합치면 그 문장의 의미가 된다.
+그러나 인간의 언어는 합성성의 원리를 어기는 경우가 아주 많다.
+
+단어가 나타나는 환경이 거의 동일하다면 그 단어들은 비슷한 단어라고 볼 수 있다.
+그래서 단어의 distribution을 벡터 스페이스로 본다.
+이를 Word2Vec 또는 Vector Semantics라고 부른다.
+
+**워드 임베딩**. word를 vector space에 내재시키는 것을 embedding이라 한다.
+
+**count vector**. 특정 문서에서 각 단어가 등장한 횟수를 세면, 각 문서는 count vector가 된다. 이때 count vector가 비슷하면 비슷한 문서로 볼 수 있다. 단어(terms)들의 frequency가 유사하기 때문이다.
+
+**term-document matrix**:
+
+![term-docu-matrix1](images/term-docu-matrix1.png)
+
+위처럼 두 문서의 유사함뿐만 아니라 아래 그림처럼 두 단어의 유사함도 파악할 수 있다. 단어의 문맥이 곧 문서라고 볼 수 있기 때문이다.
+
+![term-docu-matrix2](images/term-docu-matrix2.png)
+
+**term-context matrix**: 문서가 아니라 한 단어와 그 단어와 함께 쓰이는 context 단어의 count vector를 통해서도 두 단어의 유사함을 알 수 있다.
+
+![term-context-mat.png](images/term-context-mat.png)
+
+**word-word or word-context matrix**: 범위를 document로 하면 count vector가 너무 sparse하게 되는 문제가 있기 때문에, 전체 document가 아닌 범위가 더 작은 context를 사용한다.
+context를 사용한다는 말은, 예를 들어, 특정 word 주변에 앞뒤로 7개의 단어만 제한해서 본다는 뜻이다.
+
+**window size**: window size가 작으면, love나 loves 같은, 문법적인(syntactic) 정보가 포착된다.
+window size가 크면 의미적인(semantic) 정보가 포착된다.
+
+**두 단어가 동시에 발생할 때 나타내는 2가지 관계(2 kinds of co-occurence between 2 words)**:
+
+`real-time 15:50`
+
++ 통합적 관계. First-order co-occurence.
+  + 인접한 단어들이 나타난다.
+  + e.g. wrote book | wrote poem. (wrote를 기준으로 뒤에 오는 목적어)
+
++ 계열적 관계. Second-order co-occurence.
+  + 같은 계열의 단어들이 나타난다.
+  + e.g. wrote - said - remarked. (wrote 뒤에 오는 목적어를 기준으로 앞에 오는 단어들)
+
+**끝.**
+
+---
+
+## 20171108 5주차
+
+**복습**.
+
+**수업**.
+
+CFG로 CKY.
+Parse Tree.
+Statistical Parsing.
+
+
+---
+
+## Jurafsky :: 12.2 CFG
+
+**CFG**:
+
+자연어의 구성요소 구조를 모델링할 때 가장 흔히 사용되는 체계를 Context-Free Grammar(CFG)라고 한다.
+CFG는 크게 rule과 lexicon으로 구성된다.
+단어와 같은 개별 단위를 symbol이라고 하는데, rule은 symbol을 특정 범주로 묶거나 순서를 정하는 규칙을 의미한다.
+lexicon은 symbol 중에서 단어를 의미하는 terminal symbol에 대한 rule을 의미한다.
+
+**Symbols**:
+
+CFG에서 사용되는 symbol은 크게 두 종류이다.
+단어에 해당하는 symbol을 terminal이라고 한다.
+클러스터나 generalization을 표현하는 symbol을 non-terminal이라고 한다.
+가령, 품사(part-of-speech)의 경우 non-terminal이다.
+
+**Example (1)**:
+
+Step | How to | Matching  
+:---: |:---| :---
+1 | start symbol ($S$) | NP
+2 | rewrite the symbol using rules | Det Nominal
+3 | rewrite the symbol using rules | Det Noun
+4 | derivation as a set of strings | a flight  
+5 | derivation as a parse tree | 아래 그림 Fig. 12.1
+
+> **Note**: 하나의 symbol은 다수의 rule을 가질 수 있다.
+
+![cfg-parse-tree](images/cfg-parse-tree.png)
+
++ NP는 Det와 Nom을 immediately dominate한다
++ NP는 Det, Nom, Noun, a, flight을 dominate한다
+
+5번 derivation에서 나와 있듯이 CFG로부터 만들어지는 formal language는 지정된 start symbol을 만족해야 한다.
+start symbol을 의미하는 $S$는 "sentence" node로 해석하기도 한다.
+$S$로부터 생성되는 다양한 strings는 곧 simplified version sentence이기 때문이다.
+
+> **Note**: sentences = strings of words
+
+**Example (2)**:
+
+Step | How to | Matching  
+:---: |:---| :---
+1 | start symbol ($S$) | NP VP
+4 | derivation as a set of strings | I prefer a morning flight
+
+![cfg-parse-tree2](images/cfg-parse-tree2.png)
+
+> **Note**: grammatical sentences = sentences that can be derived as a formal language defined by a grammar
+
+**Formal definition of CFG**:
+
+CFG를 의미하는 $G$는 다음 4가지 parameter로 정의된다.
+
++ $N$ : non-terminal symbols
++ $\Sigma$ : terminal symbols
++ $R$ : rules ($A \rightarrow \beta$)
+  + $A$ means non-terminal
+  + $B$ means strings from $(\Sigma \cup N)* $
++ $S$ : designated start symbol
+
+**Notations in CFG**:
+
+Pattern | Meaning
+:-- | :--
+Captial letters like $A, B, S$ | non-terminals  
+$S$ | start symbol
+Lowercase Greek letters like $\alpha, \beta, \gamma$ | strings drawn from $(\Sigma \cup N)* $
+Lowercase Roman letters like $u, v, w$  |  strings of terminals
+
+
+
+**끝.**
+
+---
+
+(2번 결석)
 
 ---
 
