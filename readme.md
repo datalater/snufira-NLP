@@ -168,6 +168,38 @@ Lowercase Roman letters like $u, v, w$  |  strings of terminals
 
 ---
 
+## Stanford NLP :: 12.1 POS Tagging
+
+**Open vs. Closed classes**: new memeber가 새로 생길 수 있으면 open class, 그렇지 않으면 closed class라고 한다.
+
++ Closed:
+  + determiners, pronouns, prepositions
++ Open:
+  + nouns, verbs, adjectives, adverbs
+
+**POS tagging**: 문장 내 각 단어의 품사를 태깅하는 일을 말한다.
+보통 하나의 단어는 여러 개의 품사를 갖고 있기 때문에 POS tagging은 쉽지 않다.
+
+step | content
+--- | ---
+Input | Plays - well - with - others
+Ambiguity | NNS/VEZ - UH/JJ/NNRB - IN - NNS
+Output | Plays/VBZ - well/RB - with/IN - others/NNS
+
+POS tagging이 완료되면 다양한 방면에서 사용할 수 있다.
+
++ **Text-to-speech** : 품사에 따라 발음이 달리지는 단어의 발음을 결정할 수 있다. (ex. lead)
++ **정규표현식을 사용한 언어 분석** : 정규표현식 `(Det) Adj*N+`을 사용하여 명사구(noun phrases)를 추출한다.
++ **파싱** : 파싱할 대상으로 POS를 사용할 수도 있고, 파싱의 속도 측면에서도 텍스트에 POS tagging이 되어 있어야 처리 속도가 빠르다.
++ **자연어 처리 모델** : word level에서 probability distribution을 추정하는 많은 모델들이 값이 희박한(sparse) 경우가 많다.
+POS를 알면 잘 모르는 단어가 나오더라도 그 단어의 POS를 통해 추측이 가능해진다.
+
+**POS tagging performance**:
+
+`@@@resume`: https://youtu.be/LivXkL2DO_w?t=11m2s
+
+---
+
 (2번 결석)
 
 ---
