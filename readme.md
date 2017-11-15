@@ -18,6 +18,127 @@ http://ling.snu.ac.kr/class/AI_Agent/
 ---
 
 
+## 20171115 6주차
+
+**복습**: 우리가 관심있는 것은 단어 간의 유사함이다.
+만약 단어 A와 단어 B가 비슷한 환경에서 나타난다면 두 단어는 유사한 단어일 것이다.
+단어의 의미를 벡터로 나타낼 수 있는데, 벡터를 비교하면 유사성을 알 수 있다.
+
+**4가지 벡터 모델**
+
++ Sparse vector representation
+  + term-docu/term-term
++ Dense vector representation
+  + SVD
+  + Word2Vec (neural network)
+  + Brown Cluster
+
+**sparse word-word matrix**: vocabulary에 50,000개의 단어가 있다면 word-word matrix는 50,000 by 50,000 matrix가 되고 매우 sparse하게 된다.
+
+### 01 PMI
+
+**Problem with raw counts**: N-gram 모델에서 볼 수 있었듯이, raw word의 등장빈도를 세는 것은 문제가 있다면.
+stopwords 같은 것은 매우 빈번히 등장하지만 의미를 추론할 때 좋은 정보가 아니기 때문이다.
+
+**Pointwise Mutual Information (개별 상호 정보)**:
+
+$$PMI(word_1,word_2) = \log_2 \frac{P(word_1, word_2}{P(word_1)P(word_2)}$$
+
++ 분자 : "새빨간"과 "거짓말"이 같이 등장할 확률
++ 분모 : "새빨간" unigram 확률과 "거짓말" unigram 확률의 곱셈
+
+값이 크다는 것은 서로 share하는 정보가 많다는 의미이다.
+단어 $word_1$과 단어 $word_2$가 서로 얼마나 informative한가.
+collocation.
+"새빨간" + "거짓말".
+corpus에서 개별 두 단어가 같이 나타날 확률을 센다.
+서로 밀접하게 관련되어 있다.
+
+**PMI range (값의 범위)**:
+
+negative 값이 나오면 문제가 있다.
+negative 값이 의미가 있으려면 corpus가 매우 커야 한다.
+그래서 negative 값은 모두 0으로 대체한다.
+
+그래서 positive 값만 나오도록 수식을 수정한다.
+
+$$PMI(word_1,word_2) = max(\log_2 \frac{P(word_1, word_2}{P(word_1)P(word_2)}, \ 0)$$
+
+positive 값의 의미는 그만큼 information이 증가한 것으로 생각하면 된다.
+
+**Computing (예제 계산 p.23) 및 PMI 비판**:
+
+x, y가 완전히 independent하다면 P(x,y) = P(x)P(y)가 된다.
+그러면 분모와 약분되고 결국 log1이 되어 값이 0이 된다.
+x, y가 완전히 dependent할 때 분모에서 특정 단어 y가 너무 조금 등장하여 unigram의 확률값이 낮으면, 분모 값이 매우 작으므로 전체 PMI 값은 지나치게 크게 나온다.
+두 번째 경우가 문제가 된다.
+그래서 PMI는 x, y가 서로 informative한지 알려주는 지표가 아니라 independency를 측정하는 기준으로 삼아야 한다는 비판이 있다.
+
+**Weighting PMI**:
+
+그래서 weight를 취해서 잘 나타나지 않는 단어의 확률값을 높여서 PMI 값을 낮추는 방법이 있다.
+
+**Lapalce (add-1) Smoothing**:
+
+또 다른 방법으로 smoothing이 있다.
+
+### 02 Cosine Simularity
+
+**cosine simularity**:
+
+한 마디로, 두 벡터를 좌표에 나타냈을 때 각 direction의 cosine 각도를 계산해서 두 벡터의 유사도를 측정하는 개념이다.
+
+문서에서 banana와 apple이 나온 개수를 세서 2차원 좌표로 나타낸다.
+가령, (1,3)과 (2,2)의 문서를 볼 때 유클리디안 거리로 얼마나 유사한 문서인지 측정할 수 있다.
+그런데 문제는 (2,2)와 (4,4)는 서로 유사한 문서로 봐야 하는데도 불구하고, 유클리디안 거리로 계산하면 거리가 크게 나온다.
+벡터의 direction을 고려하지 못하기 때문이다.
+그래서 cosine simularity를 사용한다.
+
+**Cosine for computing similarity (p.34)**
+
+$$cos(v, w)$$
+
+
+
+**Visualizing vectors and angles (p.37)**:
+
+벡터의 값을 내적한다.
+각 벡터를 unit 벡터로 바꾼다.
+그리고 cosine angle을 계산한다.
+cosine 값이 수직이라면 두 벡터가 관련이 없는 경우를 뜻한다.
+
+### 03 Similar Syntactic Context
+
+**Using syntax to define a word's context (p.41)**:
+
+두 단어가 유사한 구조적 context를 가지는지 측정한다.
+
+지금까지는 window 상에서 근처의 distribution을 봤다면, 여기서는 한 단계 더 나아가서 syntactic한 정보를 share했을 것이라는 가정로 유사함을 측정한다.
+그러니까 앞에서 했던 first-order(syntagmatic) 관계와 second-order(paradigmatic) 관계를 모두 고려한다. (`참조 p.17`)
+
+**tf-idf (p.45)**:
+
++ tf (term frequency): 어떤 단어가 나타날 확률
++ idf (inverse document frequency):
+
+### 04 Dense Vector
+
+**Sparse versus dense vectors**:
+
+### 05 벡터 복습
+
+대각화 가능한 행렬만이 고유값(eigen value) 분해가 가능하다.
+
+### 06 Dense Vectors via SVD
+
+`07-2-0-SVDandLSA.pdf`
+
+
+
+
+
+
+---
 
 ## 20171113 6주차
 
@@ -190,7 +311,7 @@ POS tagging이 완료되면 다양한 방면에서 사용할 수 있다.
 
 + **Text-to-speech** : 품사에 따라 발음이 달리지는 단어의 발음을 결정할 수 있다. (ex. lead)
 + **정규표현식을 사용한 언어 분석** : 정규표현식 `(Det) Adj*N+`을 사용하여 명사구(noun phrases)를 추출한다.
-+ **파싱** : 파싱할 대상으로 POS를 사용할 수도 있고, 파싱의 속도 측면에서도 텍스트에 POS tagging이 되어 있어야 처리 속도가 빠르다.
++ **파싱** : 파싱할 입력값으로 POS를 사용할 수도 있고, 파싱의 속도 측면에서도 텍스트에 POS tagging이 되어 있어야 처리 속도가 빠르다.
 + **자연어 처리 모델** : word level에서 probability distribution을 추정하는 많은 모델들이 값이 희박한(sparse) 경우가 많다.
 POS를 알면 잘 모르는 단어가 나오더라도 그 단어의 POS를 통해 추측이 가능해진다.
 
