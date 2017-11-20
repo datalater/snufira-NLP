@@ -17,6 +17,85 @@ http://ling.snu.ac.kr/class/AI_Agent/
 ---
 ---
 
+## 20171120 7주차 :: Intro to Word2Vector
+
+```
+기말과제
+
+1. 한글 데이터로 Word2Vec, GloVe, FastText 모델 비교 평가
+```
+
+**복습**:
+단어의 의미를 벡터로 나타내면 대부분 sparse issue에 부딪침.
+sparse vector를 dense vector로 바꾸는 방법이 있다.
+벡터 고유값 성질을 활용하는 SVD.
+
+**수업**:
+
+`07-3-EfficientEstimationofWordRepresentationinVectorSpace.pdf`
+
+**n-gram**:
+주어진 단어로부터 다음에 올 단어를 예측하는 모델.
+
+**n-gram의 단점**:
+
+bigram, trigram 같은 경우 연쇄 단어를 보기 때문에 어휘의 의미의 context를 반영하기 어렵다.
+그래서 word similarity를 처리하기 어렵다.
+
+**Distributed representation of words as vectors**:
+
+그러니 similarity를 처리하기 위해 word를 vector로 표현해보자.
+$m$차원 벡터로 표현한다.
+이전에는 one-hot encoding 방식으로 단어를 벡터화했고, 그 크기가 $V$(Vocabulary 개수)차원으로 매우 컸다.
+이제는 훨씬 더 축소된 $m$차원의 feature 값을 가진 벡터로 표현한다.
+
+one-hot encoding 방식으로는 두 벡터를 내적해봤자 값이 0이 되므로 similarity를 측정할 수 없었다.
+그래서 continuous한 word representation을 한다.
+word veotor 모델은 syntactic하고 semantic한 의미가 포착되더라.
+
+word vector간의 거리를 통해 단어에 대한 유추(word analogy)가 가능해졌고, 많은 사람들의 관심을 받고 활용되었다.
+
+**word vector를 만드는 초창기 알고리즘**:
+
+Feedforward Neural Network Language Model과 Recurrent Neural Network Language Model은 초창기에 만들어진 알고리즘으로 계산이 매우 많이 필요하다.
+반면, Word2Vec은 hidden layer가 몇 개 없는 shallow한 모델이다.
+
++ Feedforward NNLM : 특정 개수의 이전 sequence 데이터를 입력해서 다음에 올 단어를 예측하는 neural network. 연산량이 많아 학습하는 데 오래 걸린다. 이전 sequence만 살펴보므로 다다음에 오는 단어를 고려하지 못하는 한계가 있다.
++ Recurrent NNLM : Recurrent하므로 이전 단어에 대한 기록을 유지한다. input 데이터의 개수를 특정할 필요가 없다. 입력이 긴 문장에서도 학습이 잘 되는 모델이 필요하다 (그래서 나온 게 Word2Vec)
+
+**New Log-linear Models**:
+
+초창기 알고리즘과 달리 적은 연산으로도 word vector를 만들 수 있다.
+초창기 알고리즘은 non-linear한 hidden layer 때문에 연산의 복잡도가 올라간다.
+이와 달리 linear한 연산만으로도 word vector를 만들 수 있는 모델이 있다. (linear 모델이므로 어떻게 보면 딥러닝은 아니다)
+이러한 linear 모델에는 2가지 아키텍쳐가 있다.
+
++ Continuous Bag-of-words Model
++ Continuous Skip-gram Model
+
+`07-2-1-Word2VecSupple1.pdf`
+
+**Word2Vec 2가지 아키텍처**:
+
++ CBOW : 문맥으로부터 단어를 추론한다.
++ Skip-gram : 단어로부터 문맥을 추론한다.
+
+우리의 직관이 들어가는 것은 CBOW이다.
+왜냐하면 보통 문맥으로부터 단어를 예측하는 것이 보통이고 n-gram에서 했던 것도 같은 맥락이었다.
+그런데 학습 측면에서 Skip-gram이 더 낫다.
+
+**Skip-gram이 더 나은 점**:
+
+같은 크기의 말뭉치여도 CBOW와 달리 Skip-gram은 update를 할 때 여러 번하게 된다.
+왜냐하면 CBOW는 여러 개의 주변 단어로부터 중심단어 1개를 예측하지만, Skip-gram은 중심단어로부터 주변 단어 여러 개의를 예측하기 때문에 update를 더 많이 한다.
+즉 학습량이 훨씬 더 커지기 때문에 그만큼 정교한 학습이 이루어진다.
+
+**Word2Vec**:
+
+
+
+
+---
 
 ## 20171115 6주차
 
@@ -42,7 +121,7 @@ stopwords 같은 것은 매우 빈번히 등장하지만 의미를 추론할 때
 
 **Pointwise Mutual Information (개별 상호 정보)**:
 
-$$PMI(word_1,word_2) = \log_2 \frac{P(word_1, word_2}{P(word_1)P(word_2)}$$
+$$PMI(word_1,word_2) = \log_2 \frac{P(word_1, word_2)}{P(word_1)P(word_2)}$$
 
 + 분자 : "새빨간"과 "거짓말"이 같이 등장할 확률
 + 분모 : "새빨간" unigram 확률과 "거짓말" unigram 확률의 곱셈
@@ -62,7 +141,7 @@ negative 값이 의미가 있으려면 corpus가 매우 커야 한다.
 
 그래서 positive 값만 나오도록 수식을 수정한다.
 
-$$PMI(word_1,word_2) = max(\log_2 \frac{P(word_1, word_2}{P(word_1)P(word_2)}, \ 0)$$
+$$PMI(word_1,word_2) = max(\log_2 \frac{P(word_1, word_2)}{P(word_1)P(word_2)}, \ 0)$$
 
 positive 값의 의미는 그만큼 information이 증가한 것으로 생각하면 된다.
 
@@ -289,7 +368,13 @@ Lowercase Roman letters like $u, v, w$  |  strings of terminals
 
 ---
 
-## Stanford NLP :: 12.1 POS Tagging
+## Stanford NLP :: 13-1 Statistical Natural Language parsing
+
+
+
+---
+
+## Stanford NLP :: 12-1 POS Tagging
 
 **Open vs. Closed classes**: new memeber가 새로 생길 수 있으면 open class, 그렇지 않으면 closed class라고 한다.
 
@@ -317,7 +402,17 @@ POS를 알면 잘 모르는 단어가 나오더라도 그 단어의 POS를 통�
 
 **POS tagging performance**:
 
-`@@@resume`: https://youtu.be/LivXkL2DO_w?t=11m2s
+POS taggning의 성능은 정확도로 계산한다.
+가장 간단한 방법인 baseline 방식은 training data에서 해당 단어가 가장 많이 쓰이는 품사로 태깅하고, training data에 없는 단어는 명사로 태깅한다.
+이렇게 간단하고 단순한 baseline 방식이지만 정확도는 90%이다.
+
+**Sequence information**:
+
+**Feature-based tagger**:
+
+
+
+
 
 ---
 
