@@ -9,12 +9,55 @@ http://ling.snu.ac.kr/class/AI_Agent/
 
 + Regular Expression
 + Finite State Automata
-+ Edit Distance : 두 string의 유사성 판단
-+ Minimum Edit Distance : 두 string의
++ Minimum Edit Distance : 두 string이 같아지기 위해 필요한 편집 횟수
 
 
 ---
 ---
+---
+
+<<<<<<< Updated upstream
+## 20171122 7주차 :: GloVe
+
+`07-2-1-Word2VecSupple1.pdf`
+
+**수업**:
+
+**GloVe**:
+
++ unsupervised learning
+
+이전에는 일종의 local한 context를 고려했다.
+GloVe는 전체(global) 맥락을 고려한다.
+
+LSA 모델 비판.
+analogy task 못하니까.
+skip-gram이나 word2vec은 analogy task는 잘하지만 전체 코퍼스의 통계적인 값을 활용하지는 못한다.
+local text에서만 나타는 특징만 갖고 있는 한계가 있다.
+
+GloVe는 전체 맥락을 미리 고려한 후에 training을 한다.
+
+**Global Vectors for Word Representation**:
+
+log-linear 모델.
+word-word co-occurence probabilities를 활용하자.
+특정 문맥단어가 주어졌을 때 임베딩된 두 단어벡터의 내적이 두단어의 동시등장확률간 비율에 되게끔 임베딩한다.
+
++ $P(solid | ice) = 1.9 \times 10^{-4}$
++ $P(solid | steam) = 2.2 \times 10^{-5}$
++ $\frac{P(solid | ice)}{P(solid | steam)} = 8.9$
+
+가령, "ice"라는 중심 단어가 나오면 context 단어로 "solid" 확률을 계산할 때, 두 단어가 corpus 전체에서 동시 등장하는(co-occurence) 비율을 고려한다.
+이 비율을 미리 compile해둔다.
+특정 문맥 단어 "solid"가 주어지면 실제로 임베딩되는 두 단어 "ice"와 "steam" 벡터의 내적이 미리 컴파일해둔 비율 (8.9)을 유지하도록 training 하자.
+
+
+
+
+
+
+
+
 ---
 
 ## 20171120 7주차 :: Intro to Word2Vector
@@ -37,9 +80,7 @@ sparse vector를 dense vector로 바꾸는 방법이 있다.
 **n-gram**:
 주어진 단어로부터 다음에 올 단어를 예측하는 모델.
 
-**n-gram의 단점**:
-
-bigram, trigram 같은 경우 연쇄 단어를 보기 때문에 어휘의 의미의 context를 반영하기 어렵다.
+**n-gram의 단점**: bigram, trigram 같은 경우 연쇄 단어를 보기 때문에 어휘의 의미의 context를 반영하기 어렵다.
 그래서 word similarity를 처리하기 어렵다.
 
 **Distributed representation of words as vectors**:
@@ -462,6 +503,10 @@ N, V, Adj, Adv로 Tagset을 너무 적게 한정하면 Noun 중에서 pronoun이
 Treebank : 문장 구조 분석.
 NLTK에도 있음.
 
+=======
+## 20171030 4주차
+
+>>>>>>> Stashed changes
 
 
 ---
